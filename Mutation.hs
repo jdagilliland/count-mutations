@@ -106,21 +106,20 @@ uniqueSynonymous mutType bias codonMut = sum
     biasIndex Replacement Replacement = maximum . map sumMut
     sumMut          = sum
                     . map ( \(_, _, sil)
-                         -> if (biasValue mutType sil) then 1 else 0 )
+                         -> if ((biasValue mutType) sil) then 1 else 0 )
     biasValue Silent      = id
     biasValue Replacement = not
-    mutatedCodon 0 xs = xs
+    mutatedCodon 0 xs      = xs
     mutatedCodon _ Nothing = Nothing
     mutatedCodon 1 (Just xs)
-        | length xs == 1 = Just xs
-        | otherwise      = Nothing
+        | length xs == 1   = Just xs
+        | otherwise        = Nothing
     mutatedCodon 2 (Just xs)
-        | length xs == 2 = Just xs
-        | otherwise      = Nothing
+        | length xs == 2   = Just xs
+        | otherwise        = Nothing
     mutatedCodon 3 (Just xs)
-        | length xs == 6 = Just xs
-        | otherwise      = Nothing
-
+        | length xs == 6   = Just xs
+        | otherwise        = Nothing
 
 -- Return the mutations if they exist between the germline and a clone
 -- (unused in this algorithm, only here for completionist reasons).
