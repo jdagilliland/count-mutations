@@ -91,6 +91,7 @@ mutationCounts opts = do
     let contentsNoCarriages  = filter (/= '\r') $ contents
     -- No newlines in sequence
     let contentsNoNewlines  = joinSeq contentsNoCarriages
+    writeFile ((output opts) ++ "test") contentsNoNewlines
 
     let cloneMap  = generateCloneMap contentsNoNewlines
 

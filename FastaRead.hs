@@ -40,7 +40,7 @@ joinSeq = lineCompress
     seq                    = concat . tail . lines
     lineCompress []        = []
     lineCompress ('\n':xs) = '\n' : (lineCompress $ dropWhile (== '\n') xs)
-    lineCompress (x:xs)    = x : (lineCompress $ dropWhile (== '\n') xs)
+    lineCompress (x:xs)    = x : (lineCompress xs)
 
 -- Takes a fasta file string of the format ">>[Germline header]\n[Germline
 -- sequence]\n>[Mutant header]\n[Mutant
