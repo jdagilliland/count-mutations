@@ -9,6 +9,7 @@
 module FastaRead where
 
 -- Built in
+import Data.List
 import qualified Data.Map as M
 
 -- Cabal
@@ -17,12 +18,33 @@ import qualified Data.List.Split as Split
 -- Local
 import Types
 
+-- Takes a fasta file string and removes newlines in the sequences to make
+-- this compatible with the fasta parser.
+joinSeq :: String -> String
+joinSeq = tail
+        . concat
+        . map newEntry
+        . filter (/= "")
+        . Split.splitOn ">>"
+  where
+    newEntry x = if elem '>' x then cloneEntry x else germEntry x
+    germEntry x = newGerm x
+    cloneEntry x = newGerm x 
+                ++ concat (map newClone . filter (/= "") . clone $ x)
+    newGerm x = "\n>>" ++ (header x) ++ "\n" ++ (seq x)
+    newClone x = "\n>" ++ (header x) ++ "\n" ++ (seq x)
+    germline = head . Split.splitOn ">"
+    clone    = tail . Split.splitOn ">"
+    header = head . lines
+    seq = concat . tail . lines
+
 -- Takes a fasta file string of the format ">>[Germline header]\n[Germline
 -- sequence]\n>[Mutant header]\n[Mutant
 -- sequence]\n>[MH]\n[MS]...\n>>[GH]\n[GS]\n>[MH]\n[MS]...etc" and returns
 -- a CloneMap in order to generate the basic building block for the
 -- mutation counting.  Note: Several repeating germlines, so they need
--- a unique identifier (an integer in this case).
+-- a unique identifier (an integer in this case). Also removes empty clones
+-- (only a germline appears).
 generateCloneMap :: String -> CloneMap
 generateCloneMap = M.fromList . map getCodonSplit . getSequences
   where
@@ -36,6 +58,7 @@ generateCloneMap = M.fromList . map getCodonSplit . getSequences
     assocList                      = map assocMap . germlineSplit
     assocMap (x, y)                = ((x, germline y), clones y)
     germlineSplit                  = zip [0..]
+                                   . filter (\x -> (length . lines $ x) > 2)
                                    . filter (/= "")
                                    . Split.splitOn ">>"
     germline                       = take 2 . lines

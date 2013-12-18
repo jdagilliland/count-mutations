@@ -1,4 +1,4 @@
--- Compare Diversity with Mutation Counts
+-- Mutation Counts from Germline to Mutants
 -- Main
 -- By G.W. Schwartz
 
@@ -28,11 +28,12 @@ import FastaRead
 import MutationCount
 
 -- | Command line arguments
-data Options = Options { inputMutType :: MutationType
-                       , inputBias :: Bias
+data Options = Options { inputMutType  :: MutationType
+                       , inputBias     :: Bias
                        , inputCodonMut :: CodonMut
-                       , input :: String
-                       , output :: String
+                       , inputMutCount :: MutCount
+                       , input         :: String
+                       , output        :: String
                        }
 
 -- | Command line options
@@ -56,8 +57,15 @@ options = Options
          <> short 'c'
          <> metavar "[0]|1|2|3"
          <> value 0
-         <> help "Only count mutations from codons with this many mutations \
+         <> help "Only count mutations from codons with this many mutations\
                  \ (0 is the same as include all codons)" )
+      <*> option
+          ( long "inputMutCount"
+         <> short 'm'
+         <> metavar "[1]|2|3|..."
+         <> value 1
+         <> help "Only count a unique mutation if it appears this many\
+                 \ or more times" )
       <*> strOption
           ( long "input"
          <> short 'i'
@@ -77,9 +85,15 @@ mutationCounts opts = do
     let mutType  = inputMutType opts
     let bias     = inputBias opts
     let codonMut = inputCodonMut opts
+    let mutCount = inputMutCount opts
 
     -- Get rid of carriages
-    let cloneMap  = generateCloneMap . filter (/= '\r') $ contents
+    let contentsNoCarriages  = filter (/= '\r') $ contents
+    -- No newlines in sequence
+    let contentsNoNewlines  = joinSeq contentsNoCarriages
+
+    writeFile ("testres.fasta") $ contentsNoNewlines
+    let cloneMap  = generateCloneMap contentsNoNewlines
 
     -- Generate the germline to clone map
     let cloneMutMap         = generateCloneMutMap cloneMap
@@ -92,8 +106,8 @@ mutationCounts opts = do
                               cloneMutMap
 
     -- Save the counts
-    writeFile (output opts) $
-        printMutCounts mutType bias codonMut combinedCloneMutMap positionCloneMap
+    writeFile (output opts) $ printMutCounts
+        mutType bias codonMut mutCount combinedCloneMutMap positionCloneMap
 
 main :: IO ()
 main = execParser opts >>= mutationCounts

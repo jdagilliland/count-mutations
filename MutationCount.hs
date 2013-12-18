@@ -42,10 +42,11 @@ generatePositionCloneMap = joinSilentMutations
 printMutCounts :: MutationType
                      -> Bias
                      -> CodonMut
+                     -> MutCount
                      -> MutationMap
                      -> PositionCloneMap
                      -> String
-printMutCounts mutType bias codonMut mutationMap mutTypeMap =
+printMutCounts mutType bias codonMut mutCount mutationMap mutTypeMap =
         header ++ body
   where
     header           = "position,count,count_weight\n"
@@ -58,6 +59,6 @@ printMutCounts mutType bias codonMut mutationMap mutTypeMap =
                    ++ (show . trueMutCount x $ mutTypeMap)
                    ++ ","
                    ++ (show . length . filterMutStab (\_ -> True) $ xs)
-    trueMutCount p  = uniqueSynonymous mutType bias codonMut
+    trueMutCount p  = uniqueSynonymous mutType bias codonMut mutCount
                     . fromMaybe [[]]
                     . M.lookup p

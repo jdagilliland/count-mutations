@@ -85,21 +85,31 @@ mutPos (x:xs) (y:ys) n ns
 -- | Find the number of unique synonymous or non-synonymous mutations by
 -- nucleotide in each codon while taking into account theoretical
 -- intermediate steps from the germline.
-uniqueSynonymous :: MutationType -> Bias -> CodonMut -> [[Mutation]] -> Int
-uniqueSynonymous mutType bias codonMut = sum
-                                       . map (length . getMutationCount)
+uniqueSynonymous :: MutationType
+                 -> Bias
+                 -> CodonMut
+                 -> MutCount
+                 -> [[Mutation]]
+                 -> Int
+uniqueSynonymous mutType bias codonMut mutCount = sum
+                                                . map (length
+                                                      . getMutationCount)
   where
     getMutationCount   = nub
+                       . mutCountFrequent
+                       . filter (\(_, _, sil) -> biasValue mutType sil)
                        . concat
-                       . map (filter (\(_, _, sil) -> biasValue mutType sil))
-                       . map mutBias
-                       . map fromJust
+                       . map (mutBias . fromJust)
                        . filter isJust
                        . map (mutatedCodon codonMut)  -- Only codons with n muts
                        . map mutation
-    mutBias []      = []
-    mutBias xs      = xs !! (fromJust $ biasResult xs)
-    biasResult xs   = elemIndex (biasIndex mutType bias xs) (map sumMut xs)
+    mutCountFrequent = concat
+                     . filter (\x -> length x >= mutCount)
+                     . group
+                     . sort
+    mutBias []       = []
+    mutBias xs       = xs !! (fromJust $ biasResult xs)
+    biasResult xs    = elemIndex (biasIndex mutType bias xs) (map sumMut xs)
     biasIndex Silent Silent           = maximum . map sumMut
     biasIndex Silent Replacement      = minimum . map sumMut
     biasIndex Replacement Silent      = minimum . map sumMut
