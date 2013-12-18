@@ -96,8 +96,10 @@ mutationCounts opts = do
 
     -- Generate the germline to clone map
     let cloneMutMap         = generateCloneMutMap cloneMap
+
     -- Generate the germline to clone map separated by clones
     let positionCloneMap   = generatePositionCloneMap cloneMutMap
+
     -- Generate the position to clone map
     let combinedCloneMutMap = M.unionsWith (++) .
                               map snd           .

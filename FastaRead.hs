@@ -21,22 +21,26 @@ import Types
 -- Takes a fasta file string and removes newlines in the sequences to make
 -- this compatible with the fasta parser.
 joinSeq :: String -> String
-joinSeq = tail
+joinSeq = lineCompress
+        . tail
         . concat
         . map newEntry
         . filter (/= "")
         . Split.splitOn ">>"
   where
-    newEntry x = if elem '>' x then cloneEntry x else germEntry x
-    germEntry x = newGerm x
-    cloneEntry x = newGerm (germline x)
-                ++ concat (map newClone . filter (/= "") . clone $ x)
-    newGerm x = "\n>>" ++ (header x) ++ "\n" ++ (seq x)
-    newClone x = "\n>" ++ (header x) ++ "\n" ++ (seq x)
-    germline = head . Split.splitOn ">"
-    clone    = tail . Split.splitOn ">"
-    header = head . lines
-    seq = concat . tail . lines
+    newEntry x             = if elem '>' x then cloneEntry x else germEntry x
+    germEntry x            = newGerm x
+    cloneEntry x           = newGerm (germline x)
+                          ++ concat (map newClone . filter (/= "") . clone $ x)
+    newGerm x              = "\n>>" ++ (header x) ++ "\n" ++ (seq x)
+    newClone x             = "\n>" ++ (header x) ++ "\n" ++ (seq x)
+    germline               = head . Split.splitOn ">"
+    clone                  = tail . Split.splitOn ">"
+    header                 = head . lines
+    seq                    = concat . tail . lines
+    lineCompress []        = []
+    lineCompress ('\n':xs) = '\n' : (lineCompress $ dropWhile (== '\n') xs)
+    lineCompress (x:xs)    = x : (lineCompress $ dropWhile (== '\n') xs)
 
 -- Takes a fasta file string of the format ">>[Germline header]\n[Germline
 -- sequence]\n>[Mutant header]\n[Mutant
@@ -58,7 +62,7 @@ generateCloneMap = M.fromList . map getCodonSplit . getSequences
     assocList                      = map assocMap . germlineSplit
     assocMap (x, y)                = ((x, germline y), clones y)
     germlineSplit                  = zip [0..]
-                                   . filter (\x -> (length . lines $ x) > 2)
+                                   . filter (\x -> elem '>' x)
                                    . filter (/= "")
                                    . Split.splitOn ">>"
     germline                       = take 2 . lines
