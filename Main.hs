@@ -92,7 +92,6 @@ mutationCounts opts = do
     -- No newlines in sequence
     let contentsNoNewlines  = joinSeq contentsNoCarriages
 
-    writeFile ("testres.fasta") $ contentsNoNewlines
     let cloneMap  = generateCloneMap contentsNoNewlines
 
     -- Generate the germline to clone map

@@ -29,7 +29,7 @@ joinSeq = tail
   where
     newEntry x = if elem '>' x then cloneEntry x else germEntry x
     germEntry x = newGerm x
-    cloneEntry x = newGerm x 
+    cloneEntry x = newGerm (germline x)
                 ++ concat (map newClone . filter (/= "") . clone $ x)
     newGerm x = "\n>>" ++ (header x) ++ "\n" ++ (seq x)
     newClone x = "\n>" ++ (header x) ++ "\n" ++ (seq x)
