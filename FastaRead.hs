@@ -19,7 +19,8 @@ import qualified Data.List.Split as Split
 import Types
 
 -- Takes a fasta file string and removes newlines in the sequences to make
--- this compatible with the fasta parser.
+-- this compatible with the fasta parser. The lineCompress function should
+-- get rid of any extra newlines messing with the code.
 joinSeq :: String -> String
 joinSeq = lineCompress
         . tail
@@ -32,8 +33,12 @@ joinSeq = lineCompress
     germEntry x            = newGerm x
     cloneEntry x           = newGerm (germline x)
                           ++ concat (map newClone . filter (/= "") . clone $ x)
-    newGerm x              = "\n>>" ++ (header x) ++ "\n" ++ (seq x)
-    newClone x             = "\n>" ++ (header x) ++ "\n" ++ (seq x)
+    newGerm x
+        | seq x /= ""      = "\n>>" ++ (header x) ++ "\n" ++ (seq x)
+        | otherwise        = ""
+    newClone x
+        | seq x /= ""      = "\n>" ++ (header x) ++ "\n" ++ (seq x)
+        | otherwise        = ""
     germline               = head . Split.splitOn ">"
     clone                  = tail . Split.splitOn ">"
     header                 = head . lines
