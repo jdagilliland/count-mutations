@@ -10,6 +10,9 @@ module Translation where
 -- Built in
 import Data.Char
 
+-- Cabal
+import qualified Data.List.Split as Split
+
 -- Local
 import Types
 
@@ -39,9 +42,10 @@ codon2aa x
     | codon `elem` ["GTT", "GTC", "GTA", "GTG"]               = 'V'
     | codon `elem` ["TAA", "TGA", "TAG"]                      = '*'
     | codon `elem` ["---", "..."]                             = '-'
-    | codon == "~~~"                                          = '~'
-    | 'N' `elem` codon                                        = '~'
-    | '-' `elem` codon                                        = '~'
+    | codon == "~~~"                                          = '-'
+    | 'N' `elem` codon                                        = '-'
+    | '-' `elem` codon                                        = '-'
+    | '.' `elem` codon                                        = '-'
     | otherwise                                               = error errorMsg
   where
     codon    = map toUpper x
@@ -50,5 +54,5 @@ codon2aa x
 -- Translates a string of nucleotides
 -- Different from normal as this accepts a codon list. This is a horrible
 -- program that I should fully change to the other one soon.
-translate :: [Codon] -> String
-translate = map codon2aa . filter ((== 3) . length)
+translate :: String -> String
+translate = map codon2aa . filter ((== 3) . length) . Split.chunksOf 3
