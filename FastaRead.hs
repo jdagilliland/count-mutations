@@ -23,7 +23,6 @@ import Types
 -- get rid of any extra newlines messing with the code.
 joinSeq :: Bool -> String -> String
 joinSeq removeNFlag = lineCompress
-                    . map (removeN removeNFlag)
                     . tail
                     . concat
                     . map newEntry
@@ -43,7 +42,7 @@ joinSeq removeNFlag = lineCompress
     germline               = head . Split.splitOn ">"
     clone                  = tail . Split.splitOn ">"
     header                 = head . lines
-    seq                    = concat . tail . lines
+    seq                    = map (removeN removeNFlag) . concat . tail . lines
     lineCompress []        = []
     lineCompress ('\n':xs) = '\n' : (lineCompress $ dropWhile (== '\n') xs)
     lineCompress (x:xs)    = x : (lineCompress xs)
