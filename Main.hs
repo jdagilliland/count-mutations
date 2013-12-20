@@ -32,6 +32,7 @@ data Options = Options { inputMutType  :: MutationType
                        , inputBias     :: Bias
                        , inputCodonMut :: CodonMut
                        , inputMutCount :: MutCount
+                       , removeN       :: Bool
                        , input         :: String
                        , output        :: String
                        }
@@ -66,6 +67,10 @@ options = Options
          <> value 1
          <> help "Only count a unique mutation if it appears this many\
                  \ or more times" )
+      <*> switch
+          ( long "removeN"
+         <> short 'N'
+         <> help "Whether to remove N or n in the sequence" )
       <*> strOption
           ( long "input"
          <> short 'i'
@@ -90,7 +95,7 @@ mutationCounts opts = do
     -- Get rid of carriages
     let contentsNoCarriages  = filter (/= '\r') $ contents
     -- No newlines in sequence
-    let contentsNoNewlines  = joinSeq contentsNoCarriages
+    let contentsNoNewlines  = joinSeq (removeN opts) contentsNoCarriages
 
     let cloneMap  = generateCloneMap contentsNoNewlines
 

@@ -21,13 +21,14 @@ import Types
 -- Takes a fasta file string and removes newlines in the sequences to make
 -- this compatible with the fasta parser. The lineCompress function should
 -- get rid of any extra newlines messing with the code.
-joinSeq :: String -> String
-joinSeq = lineCompress
-        . tail
-        . concat
-        . map newEntry
-        . filter (/= "")
-        . Split.splitOn ">>"
+joinSeq :: Bool -> String -> String
+joinSeq removeNFlag = lineCompress
+                    . map (removeN removeNFlag)
+                    . tail
+                    . concat
+                    . map newEntry
+                    . filter (/= "")
+                    . Split.splitOn ">>"
   where
     newEntry x             = if elem '>' x then cloneEntry x else germEntry x
     germEntry x            = newGerm x
@@ -46,6 +47,10 @@ joinSeq = lineCompress
     lineCompress []        = []
     lineCompress ('\n':xs) = '\n' : (lineCompress $ dropWhile (== '\n') xs)
     lineCompress (x:xs)    = x : (lineCompress xs)
+    removeN False x        = x
+    removeN True 'N'       = '-'
+    removeN True 'n'       = '-'
+    removeN True x         = x
 
 -- Takes a fasta file string of the format ">>[Germline header]\n[Germline
 -- sequence]\n>[Mutant header]\n[Mutant
