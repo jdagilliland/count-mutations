@@ -1,6 +1,6 @@
-== count-mutations ==
+# count-mutations
 
-Gregory W. Schwartz
+## Gregory W. Schwartz
 
 Takes a fasta file in the format of ">>Germline header\nGermline
 sequence\n>Mutant header\nMutant sequence...etc" and generates the
