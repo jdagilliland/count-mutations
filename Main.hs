@@ -1,4 +1,4 @@
--- Mutation Counts from Germline to Mutants
+-- count-mutations
 -- Main
 -- By G.W. Schwartz
 
@@ -122,4 +122,4 @@ main = execParser opts >>= mutationCounts
       ( fullDesc
      <> progDesc "Return the mutation counts with certain biases from the \
                  \ germline to the mutants within clones"
-     <> header "Germline to Clone Mutant Mutation Count, Gregory W. Schwartz" )
+     <> header "count-mutations, Gregory W. Schwartz" )
