@@ -9,6 +9,13 @@ position in a dataframe type format. Contains flags to bias for or
 against silent or replacement mutations, along with only including
 codons with certain number of mutations.
 
+To install:
+```
+cabal configure
+cabal build
+cabal install
+```
+
 ```
 count-mutations, Gregory W. Schwartz
 
