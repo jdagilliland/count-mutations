@@ -41,34 +41,34 @@ data Options = Options { inputMutType  :: MutationType
 options :: Parser Options
 options = Options
       <$> option
-          ( long "inputMutType"
+          ( long "input-mut-type"
          <> short 't'
          <> metavar "[Silent]|Replacement"
          <> value Silent
          <> help "The type of mutation to be counted" )
       <*> option
-          ( long "inputBias"
+          ( long "input-bias"
          <> short 'b'
          <> metavar "[Silent]|Replacement"
          <> value Silent
          <> help "The type of mutation to bias for when calculating\
                  \ intermediate codons" )
       <*> option
-          ( long "inputCodonMut"
+          ( long "input-codon-mut"
          <> short 'c'
          <> metavar "[0]|1|2|3"
          <> value 0
          <> help "Only count mutations from codons with this many mutations\
                  \ (0 is the same as include all codons)" )
       <*> option
-          ( long "inputMutCount"
+          ( long "input-mut-count"
          <> short 'm'
          <> metavar "[1]|2|3|..."
          <> value 1
          <> help "Only count a unique mutation if it appears this many\
                  \ or more times" )
       <*> switch
-          ( long "removeN"
+          ( long "remove-N"
          <> short 'N'
          <> help "Whether to remove N or n in the sequence" )
       <*> strOption
