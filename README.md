@@ -11,8 +11,7 @@ codons with certain number of mutations.
 
 To install:
 ```
-cabal configure
-cabal build
+cabal update
 cabal install
 ```
 
