@@ -34,6 +34,7 @@ data Options = Options { inputMutType  :: MutationType
                        , inputMutCount :: MutCount
                        , removeN       :: Bool
                        , input         :: String
+                       , inputFasta    :: String
                        , output        :: String
                        }
 
@@ -73,6 +74,13 @@ options = Options
          <> help "Whether to remove N or n in the sequence" )
       <*> strOption
           ( long "input"
+         <> short 'I'
+         <> metavar "STRING STRING"
+         <> value ""
+         <> help "Two sequences separated by spaces in order to find\
+                 \ the muations between them" )
+      <*> strOption
+          ( long "input-fasta"
          <> short 'i'
          <> metavar "FILE"
          <> value ""
@@ -84,9 +92,17 @@ options = Options
          <> value ""
          <> help "The name of the output file with the counts" )
 
+getInput :: Options -> IO String
+getInput opts = do
+    if (inputFasta opts /= "")
+        then readFile . inputFasta $ opts
+        else return (">>SEQ1\n" ++ head seqs ++ "\n>SEQ2\n" ++ last seqs)
+  where
+    seqs = words . input $ opts
+
 mutationCounts :: Options -> IO ()
 mutationCounts opts = do
-    contents    <- readFile . input $ opts
+    contents    <- getInput opts
     let mutType  = inputMutType opts
     let bias     = inputBias opts
     let codonMut = inputCodonMut opts
